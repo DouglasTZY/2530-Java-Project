@@ -1,2 +1,4 @@
 Booking: John | Avatar | 8PM | 3 seats
 Seat: 1, Name: Muyao, Movie: Movie 1
+Seat: 3, Name: Sukuna, Movie: Movie 2
+Seat: 6, Name: Tatakai, Movie: Movie 3

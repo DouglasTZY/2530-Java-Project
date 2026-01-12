@@ -8,6 +8,9 @@ public class MainFrame extends JFrame {
     private JTextField textField1, textField2;
     private JComboBox<String> movieCombo;
     private JButton bookButton;
+    
+    // ImageIcon components (3 icons)
+    private ImageIcon posterIcon, ticketIcon, successIcon;
 
     public MainFrame() {
         setTitle("Movie Booking System");
@@ -18,6 +21,11 @@ public class MainFrame extends JFrame {
         // Create center panel with GridLayout(5, 2)
         JPanel centerPanel = new JPanel(new GridLayout(5, 2));
 
+        // Initialize 3 ImageIcons
+        posterIcon = loadIcon("poster.webp");
+        ticketIcon = loadIcon("ticket.png");
+        successIcon = loadIcon("success.png");
+        
         // Initialize JLabel × 4
         label1 = new JLabel("Seat Number:");
         label2 = new JLabel("Passenger Name:");
@@ -38,7 +46,7 @@ public class MainFrame extends JFrame {
         movieCombo = new JComboBox<>(new String[]{"Movie 1", "Movie 2", "Movie 3"});
 
         // Initialize JButton × 1
-        bookButton = new JButton("Book Movie");
+        bookButton = new JButton("Book Movie", ticketIcon);
 
         // Add components to center panel
         centerPanel.add(label1);
@@ -80,7 +88,8 @@ public class MainFrame extends JFrame {
                 fw.write("Seat: " + seats + ", Name: " + passengerName + ", Movie: " + selectedMovie + "\n");
                 fw.close();
                 
-                JOptionPane.showMessageDialog(this, "Movie booked successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                // Display success message with icon
+                JOptionPane.showMessageDialog(this, "Movie booked successfully!", "Success", JOptionPane.INFORMATION_MESSAGE, successIcon);
             } catch (java.io.IOException ex) {
                 JOptionPane.showMessageDialog(this, "Error writing to file: " + ex.getMessage(), "File Error", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
@@ -98,7 +107,16 @@ public class MainFrame extends JFrame {
         }
     }
     
-    // Helper method to demonstrate ArrayIndexOutOfBoundsException handling
+    
+    // Helper method to load ImageIcon with fallback
+    private ImageIcon loadIcon(String fileName) {
+        try {
+            return new ImageIcon(fileName);
+        } catch (Exception e) {
+            System.out.println("Warning: Could not load icon " + fileName);
+            return null;
+        }
+    }
     private void validateMovieSelection() throws ArrayIndexOutOfBoundsException {
         String[] movies = {"Movie 1", "Movie 2", "Movie 3"};
         int selectedIndex = movieCombo.getSelectedIndex();
