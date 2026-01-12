@@ -1,0 +1,2 @@
+Booking: John | Avatar | 8PM | 3 seats
+Seat: 1, Name: Muyao, Movie: Movie 1
