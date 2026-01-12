@@ -19,10 +19,10 @@ public class MainFrame extends JFrame {
         JPanel centerPanel = new JPanel(new GridLayout(5, 2));
 
         // Initialize JLabel × 4
-        label1 = new JLabel("Label 1");
-        label2 = new JLabel("Label 2");
-        label3 = new JLabel("Label 3");
-        label4 = new JLabel("Label 4");
+        label1 = new JLabel("Seat Number:");
+        label2 = new JLabel("Passenger Name:");
+        label3 = new JLabel("Select Movie:");
+        label4 = new JLabel("Email:");
 
         // Initialize JTextField × 2
         textField1 = new JTextField(15);
@@ -57,7 +57,49 @@ public class MainFrame extends JFrame {
 
     // Event handler for Book Button
     private void bookMovie() {
-        JOptionPane.showMessageDialog(this, "Movie booked successfully!");
+        // Exception 1: NumberFormatException
+        try {
+            int seats = Integer.parseInt(textField1.getText());
+            if (seats <= 0) {
+                JOptionPane.showMessageDialog(this, "Please enter a valid seat number", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            // Exception 2: IOException - File Writing
+            try {
+                String passengerName = textField2.getText();
+                String selectedMovie = (String) movieCombo.getSelectedItem();
+                
+                java.io.FileWriter fw = new java.io.FileWriter("booking.txt", true);
+                fw.write("Seat: " + seats + ", Name: " + passengerName + ", Movie: " + selectedMovie + "\n");
+                fw.close();
+                
+                JOptionPane.showMessageDialog(this, "Movie booked successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } catch (java.io.IOException ex) {
+                JOptionPane.showMessageDialog(this, "Error writing to file: " + ex.getMessage(), "File Error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Invalid seat number! Please enter a valid integer.", "Number Format Error", JOptionPane.ERROR_MESSAGE);
+            textField1.setText("");
+        }
+        
+        // Exception 3: ArrayIndexOutOfBoundsException (Demonstration)
+        try {
+            validateMovieSelection();
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            JOptionPane.showMessageDialog(this, "Invalid movie selection!", "Selection Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    // Helper method to demonstrate ArrayIndexOutOfBoundsException handling
+    private void validateMovieSelection() throws ArrayIndexOutOfBoundsException {
+        String[] movies = {"Movie 1", "Movie 2", "Movie 3"};
+        int selectedIndex = movieCombo.getSelectedIndex();
+        
+        if (selectedIndex >= movies.length) {
+            throw new ArrayIndexOutOfBoundsException("Selected movie index is out of bounds");
+        }
     }
 
     // Event handler for ComboBox
