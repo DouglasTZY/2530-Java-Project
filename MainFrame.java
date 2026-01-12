@@ -23,6 +23,12 @@ public class MainFrame extends JFrame {
         label2 = new JLabel("Passenger Name:");
         label3 = new JLabel("Select Movie:");
         label4 = new JLabel("Email:");
+        
+        // Apply UIHelper styling to labels
+        UIHelper.setTitle(label1);
+        UIHelper.setTitle(label2);
+        UIHelper.setTitle(label3);
+        UIHelper.setTitle(label4);
 
         // Initialize JTextField × 2
         textField1 = new JTextField(15);
