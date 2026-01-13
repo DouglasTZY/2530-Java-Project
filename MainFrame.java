@@ -8,7 +8,7 @@ public class MainFrame extends JFrame {
     private JTextField textField1, textField2;
     private JComboBox<String> movieCombo;
     private JButton bookButton;
-    
+
     // ImageIcon components (3 icons)
     private ImageIcon posterIcon, ticketIcon, successIcon;
 
@@ -25,13 +25,13 @@ public class MainFrame extends JFrame {
         posterIcon = loadIcon("poster.webp");
         ticketIcon = loadIcon("ticket.png");
         successIcon = loadIcon("success.png");
-        
+
         // Initialize JLabel × 4
         label1 = new JLabel("Seat Number:");
         label2 = new JLabel("Passenger Name:");
         label3 = new JLabel("Select Movie:");
         label4 = new JLabel("Email:");
-        
+
         // Apply UIHelper styling to labels
         UIHelper.setTitle(label1);
         UIHelper.setTitle(label2);
@@ -43,7 +43,7 @@ public class MainFrame extends JFrame {
         textField2 = new JTextField(15);
 
         // Initialize JComboBox × 1
-        movieCombo = new JComboBox<>(new String[]{"Movie 1", "Movie 2", "Movie 3"});
+        movieCombo = new JComboBox<>(new String[] { "Movie 1", "Movie 2", "Movie 3" });
 
         // Initialize JButton × 1
         bookButton = new JButton("Book Movie", ticketIcon);
@@ -60,7 +60,14 @@ public class MainFrame extends JFrame {
         centerPanel.add(new JPanel()); // Extra cell for GridLayout(5,2)
 
         // Add event listeners
-        bookButton.addActionListener(e -> bookMovie());
+        bookButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Book button clicked!");
+            }
+        });
         movieCombo.addItemListener(e -> updatePrice());
 
         // Add center panel to frame
@@ -75,39 +82,43 @@ public class MainFrame extends JFrame {
         try {
             int seats = Integer.parseInt(textField1.getText());
             if (seats <= 0) {
-                JOptionPane.showMessageDialog(this, "Please enter a valid seat number", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Please enter a valid seat number", "Invalid Input",
+                        JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            
+
             // Exception 2: IOException - File Writing
             try {
                 String passengerName = textField2.getText();
                 String selectedMovie = (String) movieCombo.getSelectedItem();
-                
+
                 java.io.FileWriter fw = new java.io.FileWriter("booking.txt", true);
                 fw.write("Seat: " + seats + ", Name: " + passengerName + ", Movie: " + selectedMovie + "\n");
                 fw.close();
-                
+
                 // Display success message with icon
-                JOptionPane.showMessageDialog(this, "Movie booked successfully!", "Success", JOptionPane.INFORMATION_MESSAGE, successIcon);
+                JOptionPane.showMessageDialog(this, "Movie booked successfully!", "Success",
+                        JOptionPane.INFORMATION_MESSAGE, successIcon);
             } catch (java.io.IOException ex) {
-                JOptionPane.showMessageDialog(this, "Error writing to file: " + ex.getMessage(), "File Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Error writing to file: " + ex.getMessage(), "File Error",
+                        JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Invalid seat number! Please enter a valid integer.", "Number Format Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Invalid seat number! Please enter a valid integer.",
+                    "Number Format Error", JOptionPane.ERROR_MESSAGE);
             textField1.setText("");
         }
-        
+
         // Exception 3: ArrayIndexOutOfBoundsException (Demonstration)
         try {
             validateMovieSelection();
         } catch (ArrayIndexOutOfBoundsException ex) {
-            JOptionPane.showMessageDialog(this, "Invalid movie selection!", "Selection Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Invalid movie selection!", "Selection Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-    
+
     // Helper method to load ImageIcon with fallback
     private ImageIcon loadIcon(String fileName) {
         try {
@@ -117,10 +128,11 @@ public class MainFrame extends JFrame {
             return null;
         }
     }
+
     private void validateMovieSelection() throws ArrayIndexOutOfBoundsException {
-        String[] movies = {"Movie 1", "Movie 2", "Movie 3"};
+        String[] movies = { "Movie 1", "Movie 2", "Movie 3" };
         int selectedIndex = movieCombo.getSelectedIndex();
-        
+
         if (selectedIndex >= movies.length) {
             throw new ArrayIndexOutOfBoundsException("Selected movie index is out of bounds");
         }
