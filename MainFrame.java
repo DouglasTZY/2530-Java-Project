@@ -34,7 +34,7 @@ public class MainFrame extends JFrame {
         setJMenuBar(menuBar);
 
         // 2. Load Images
-        iconPoster = loadImage("poster.webp");
+        iconPoster = loadImage("poster.png");
         iconTicket = loadImage("ticket.png");
         iconSuccess = loadImage("success.png");
 
