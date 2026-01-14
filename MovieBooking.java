@@ -1,35 +1,33 @@
-/**
- * Subclass extending Booking
- * Satisfies Inheritance requirement (1 subclass)
- */
+// Child class that extends Booking
+// This handles the specific details for a movie ticket
 public class MovieBooking extends Booking {
-    private String movieName;
-    private int seatNumber;
-    private String email;
 
-    public MovieBooking(String customerName, String movieName, int seatNumber, String email) {
-        super(customerName); // Call superclass constructor
-        this.movieName = movieName;
-        this.seatNumber = seatNumber;
-        this.email = email;
+    // Extra variables for movie details
+    private String movieTitle;
+    private int seatNo;
+    private String userEmail;
+
+    // Constructor to set all the data
+    public MovieBooking(String name, String movie, int seat, String email) {
+        super(name); // Send name to parent class (Booking)
+        this.movieTitle = movie;
+        this.seatNo = seat;
+        this.userEmail = email;
     }
 
-    public String getMovieName() {
-        return movieName;
-    }
-
-    public int getSeatNumber() {
-        return seatNumber;
-    }
-
+    // Override toString to show full details
     @Override
     public String toString() {
-        return super.toString() + "\nMovie: " + movieName + "\nSeat: " + seatNumber + "\nEmail: " + email;
+        // combine parent info with this class info
+        return super.toString() +
+                "\nMovie: " + movieTitle +
+                "\nSeat Number: " + seatNo +
+                "\nEmail: " + userEmail;
     }
 
-    // Format for file writing
-    public String toFileString() {
-        return String.format("[%s] Customer: %s, Movie: %s, Seat: %d, Email: %s",
-                getFormattedDate(), customerName, movieName, seatNumber, email);
+    // Format data for writing to text file
+    public String getDataForFile() {
+        // Format: [Date] Name | Movie | Seat | Email
+        return "[" + date + "] " + name + " | " + movieTitle + " | Seat: " + seatNo + " | " + userEmail;
     }
 }
