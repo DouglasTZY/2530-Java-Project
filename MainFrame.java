@@ -33,10 +33,10 @@ public class MainFrame extends JFrame {
         setupMenu();
         setJMenuBar(menuBar);
 
-        // 2. Load Images
-        iconPoster = loadImage("poster.png");
-        iconTicket = loadImage("ticket.png");
-        iconSuccess = loadImage("success.png");
+        // 2. Load Images (Scaled)
+        iconPoster = loadImage("poster.png", 100, 150);
+        iconTicket = loadImage("ticket.png", 30, 30);
+        iconSuccess = loadImage("success.png", 40, 40);
 
         // 3. Create Top Header Panel
         JPanel topPanel = new JPanel();
@@ -247,10 +247,13 @@ public class MainFrame extends JFrame {
         }
     }
 
-    // Helper to load image safely
-    private ImageIcon loadImage(String path) {
+    // Helper to load image safely and scale it
+    private ImageIcon loadImage(String path, int width, int height) {
         try {
-            return new ImageIcon(path);
+            ImageIcon originalIcon = new ImageIcon(path);
+            Image originalImage = originalIcon.getImage();
+            Image scaledImage = originalImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+            return new ImageIcon(scaledImage);
         } catch (Exception e) {
             System.out.println("Image not found: " + path);
             return null;
