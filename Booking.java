@@ -1,30 +1,29 @@
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Superclass representing a generic Booking
- * Satisfies Inheritance/Association requirement (1 superclass)
- */
+// Parent class to store basic booking info
 public class Booking {
-    protected String customerName;
-    protected LocalDateTime bookingDate;
+    // Protected variables so subclasses can access them
+    protected String name;
+    protected String date;
 
-    public Booking(String customerName) {
-        this.customerName = customerName;
-        this.bookingDate = LocalDateTime.now();
+    // Constructor
+    public Booking(String name) {
+        this.name = name;
+
+        // Go get the current time
+        LocalDateTime now = LocalDateTime.now();
+        // Simple format: Year-Month-Day Hour:Minute
+        DateTimeFormatter myFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        this.date = now.format(myFormat);
     }
 
-    public String getCustomerName() {
-        return customerName;
+    public String getName() {
+        return name;
     }
 
-    public String getFormattedDate() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return bookingDate.format(formatter);
-    }
-
-    @Override
+    // Display booking info
     public String toString() {
-        return "Booking Date: " + getFormattedDate() + "\nCustomer: " + customerName;
+        return "Date: " + date + "\nName: " + name;
     }
 }

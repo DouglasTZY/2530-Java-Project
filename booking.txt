@@ -3,3 +3,4 @@ Seat: 1, Name: Muyao, Movie: Movie 1
 Seat: 3, Name: Sukuna, Movie: Movie 2
 Seat: 6, Name: Tatakai, Movie: Movie 3
 [2026-01-13 15:06:03] Customer: Restry, Movie: Avengers: Endgame, Seat: 8, Email: restry7869@gmail.com
+[2026-01-14 11:29] Yuo | The Dark Knight | Seat: 5 | yuo89045@gmail.com
