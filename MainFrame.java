@@ -1,236 +1,263 @@
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 import java.util.Scanner;
 import javax.swing.*;
 
+// Main window for our booking application
 public class MainFrame extends JFrame {
-    // GUI Components
-    private JLabel label1, label2, label3, label4;
-    private JTextField textField2; // Name
-    private JSpinner seatSpinner; // Replaces textField1 for Seat Number (Satisfies JSpinner requirement)
-    private JComboBox<String> movieCombo;
-    private JButton bookButton;
-    private JMenuBar menuBar; // Additional Component #1: JMenuBar
-    private JMenu fileMenu;
-    private JMenuItem viewItem, exitItem;
 
-    // ImageIcon components (3 icons)
-    private ImageIcon posterIcon, ticketIcon, successIcon;
+    // Components
+    private JLabel lblSeat, lblName, lblMovie, lblEmail;
+    private JTextField txtName, txtEmail;
+    private JSpinner spinSeat; // For selecting seat number (1-100)
+    private JComboBox<String> comboMovies;
+    private JButton btnBook;
+
+    // Menu components
+    private JMenuBar menuBar;
+    private JMenu menuFile;
+    private JMenuItem itemBookings, itemExit;
+
+    // Images
+    private ImageIcon iconPoster, iconTicket, iconSuccess;
 
     public MainFrame() {
+        // Basic Frame settings
         setTitle("Movie Booking System");
-        setSize(600, 500); // Increased height for menu
+        setSize(600, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Initialize Menu Bar (Requirement: Additional Component)
-        initMenuBar();
+        // 1. Setup the Menu Bar
+        setupMenu();
+        setJMenuBar(menuBar);
 
-        // Create center panel with GridLayout(5, 2)
-        JPanel centerPanel = new JPanel(new GridLayout(5, 2, 10, 10)); // Added gaps
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Padding
+        // 2. Load Images
+        iconPoster = loadImage("poster.webp");
+        iconTicket = loadImage("ticket.png");
+        iconSuccess = loadImage("success.png");
 
-        // Initialize 3 ImageIcons
-        posterIcon = loadIcon("poster.webp");
-        ticketIcon = loadIcon("ticket.png");
-        successIcon = loadIcon("success.png");
+        // 3. Create Top Header Panel
+        JPanel topPanel = new JPanel();
+        JLabel lblHeader = new JLabel("Movie Booking System", iconPoster, JLabel.CENTER);
+        lblHeader.setFont(new Font("Arial", Font.BOLD, 22));
+        topPanel.add(lblHeader);
+        add(topPanel, BorderLayout.NORTH);
 
-        // Initialize JLabel × 4
-        label1 = new JLabel("Seat Number:");
-        label2 = new JLabel("Passenger Name:");
-        label3 = new JLabel("Select Movie:");
-        label4 = new JLabel("Email:");
+        // 4. Create Center Panel for Form
+        // Grid layout with 5 rows, 2 columns, and gaps
+        JPanel formPanel = new JPanel(new GridLayout(5, 2, 10, 10));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Add padding
 
-        // Apply UIHelper styling to labels
-        UIHelper.setTitle(label1);
-        UIHelper.setTitle(label2);
-        UIHelper.setTitle(label3);
-        UIHelper.setTitle(label4);
+        // initialize labels
+        lblSeat = new JLabel("Seat Number:");
+        lblName = new JLabel("Passenger Name:");
+        lblMovie = new JLabel("Select Movie:");
+        lblEmail = new JLabel("Email Address:");
 
-        // Initialize Components
-        // Requirement: Additional Component #2 (JSpinner)
-        seatSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
+        // Style labels using our helper class
+        UIHelper.makeTitle(lblSeat);
+        UIHelper.makeTitle(lblName);
+        UIHelper.makeTitle(lblMovie);
+        UIHelper.makeTitle(lblEmail);
 
-        textField2 = new JTextField(15);
+        // Initialize inputs
+        spinSeat = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1)); // min 1, max 100
+        txtName = new JTextField();
+        txtEmail = new JTextField();
 
-        // Initialize JComboBox × 1 (Read from file)
-        movieCombo = new JComboBox<>();
-        loadMoviesFromFile(); // Requirement: File Reading
+        // Movie dropdown - load from file
+        comboMovies = new JComboBox<>();
+        readMovies();
 
-        // Initialize JButton × 1
-        bookButton = new JButton("Book Movie", ticketIcon);
+        // Book Button
+        btnBook = new JButton("Book Ticket", iconTicket);
+        UIHelper.styleButton(btnBook);
 
-        // Add components to center panel
-        centerPanel.add(label1);
-        centerPanel.add(seatSpinner); // Using JSpinner
-        centerPanel.add(label2);
-        centerPanel.add(textField2);
-        centerPanel.add(label3);
-        centerPanel.add(movieCombo);
-        centerPanel.add(label4);
-        // Field for email - reusing simple textfield logic or just adding label for now
-        // as placeholder needed for grid
-        JTextField emailField = new JTextField(15);
-        centerPanel.add(emailField);
+        // Add everything to the grid
+        formPanel.add(lblSeat);
+        formPanel.add(spinSeat);
 
-        centerPanel.add(bookButton);
-        centerPanel.add(new JPanel()); // Extra cell for GridLayout(5,2)
+        formPanel.add(lblName);
+        formPanel.add(txtName);
 
-        // Create header panel with posterIcon
-        JPanel headerPanel = new JPanel();
-        JLabel posterLabel = new JLabel("Movie Booking System", posterIcon, JLabel.CENTER);
-        posterLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        headerPanel.add(posterLabel);
+        formPanel.add(lblMovie);
+        formPanel.add(comboMovies);
 
-        // Add event listeners
-        bookButton.addActionListener(e -> {
-            try {
-                processBooking(emailField.getText());
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error processing booking: " + ex.getMessage());
+        formPanel.add(lblEmail);
+        formPanel.add(txtEmail);
+
+        formPanel.add(btnBook);
+        formPanel.add(new JPanel()); // Empty spacer
+
+        add(formPanel, BorderLayout.CENTER);
+
+        // 5. Events / Actions
+
+        // Button Click Action
+        btnBook.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveBooking();
             }
         });
 
-        movieCombo.addItemListener(e -> updatePrice());
+        // Focus Listener for Name field (Auto-capitalize)
+        txtName.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                // Do nothing
+            }
 
-        // Add panels to frame
-        setJMenuBar(menuBar); // Add MenuBar
-        add(headerPanel, BorderLayout.NORTH);
-        add(centerPanel, BorderLayout.CENTER);
+            @Override
+            public void focusLost(FocusEvent e) {
+                String text = txtName.getText();
+                if (text != null && text.length() > 0) {
+                    txtName.setText(text.toUpperCase());
+                }
+            }
+        });
 
+        // Show window
         setVisible(true);
     }
 
-    private void initMenuBar() {
+    // Initialize the menu bar
+    private void setupMenu() {
         menuBar = new JMenuBar();
-        fileMenu = new JMenu("File");
-        viewItem = new JMenuItem("View Bookings");
-        exitItem = new JMenuItem("Exit");
+        menuFile = new JMenu("File");
 
-        viewItem.addActionListener(e -> viewBookings());
-        exitItem.addActionListener(e -> System.exit(0));
+        itemBookings = new JMenuItem("View Bookings");
+        itemExit = new JMenuItem("Exit");
 
-        fileMenu.add(viewItem);
-        fileMenu.addSeparator();
-        fileMenu.add(exitItem);
-        menuBar.add(fileMenu);
+        // Action to view bookings
+        itemBookings.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showBookingHistory();
+            }
+        });
+
+        // Action to close app
+        itemExit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
+        menuFile.add(itemBookings);
+        menuFile.addSeparator(); // Line separator
+        menuFile.add(itemExit);
+        menuBar.add(menuFile);
     }
 
-    // Requirement: File Reading (IO Exception handling)
-    private void loadMoviesFromFile() {
+    // Read movies from text file
+    private void readMovies() {
         try {
-            File file = new File("movies.txt");
-            if (!file.exists()) {
-                // Fallback if file doesn't exist
-                String[] defaultMovies = { "Movie 1", "Movie 2", "Movie 3" };
-                for (String m : defaultMovies)
-                    movieCombo.addItem(m);
-                return;
-            }
-            Scanner scanner = new Scanner(file);
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                if (!line.trim().isEmpty()) {
-                    movieCombo.addItem(line);
+            File f = new File("movies.txt");
+            if (f.exists()) {
+                Scanner sc = new Scanner(f);
+                while (sc.hasNextLine()) {
+                    String line = sc.nextLine();
+                    if (line.length() > 0) {
+                        comboMovies.addItem(line);
+                    }
                 }
+                sc.close();
+            } else {
+                comboMovies.addItem("Default Movie 1");
+                comboMovies.addItem("Default Movie 2");
             }
-            scanner.close();
-        } catch (FileNotFoundException e) { // Exception Handling #2
-            JOptionPane.showMessageDialog(this, "Movies file not found!");
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(this, "Cannot find movies.txt!");
         }
     }
 
-    private void processBooking(String email) {
-        // Gathering Data
-        // Exception Handling #3: NumberFormatException (handled by JSpinner implicitly
-        // but good to verify logic)
-        int seats = (Integer) seatSpinner.getValue();
-        String name = textField2.getText();
-        String movie = (String) movieCombo.getSelectedItem();
-
-        if (name.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter your name.", "Input Error", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        // Implementation of Inheritance: Creating Object of Subclass
-        MovieBooking newBooking = new MovieBooking(name, movie, seats, email);
-
-        // File Writing
-        try (FileWriter fw = new FileWriter("booking.txt", true);
-                BufferedWriter bw = new BufferedWriter(fw);
-                PrintWriter out = new PrintWriter(bw)) {
-
-            out.println(newBooking.toFileString());
-
-            // Show Custom Dialog (Requirement: Additional Component #3 - JDialog logic via
-            // JOptionPane with custom icon)
-            showConfirmationDialog(newBooking);
-
-        } catch (IOException e) { // Exception Handling #2 (IOException)
-            JOptionPane.showMessageDialog(this, "Error saving booking!", "File Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void showConfirmationDialog(MovieBooking booking) {
-        // Using JTextArea in a Dialog to show details
-        JTextArea textArea = new JTextArea(booking.toString());
-        textArea.setEditable(false);
-        textArea.setBackground(new Color(240, 240, 240));
-
-        JOptionPane.showMessageDialog(this,
-                textArea,
-                "Booking Confirmed",
-                JOptionPane.INFORMATION_MESSAGE,
-                successIcon); // Using the Success Icon
-    }
-
-    private void viewBookings() {
+    // Save booking to file
+    private void saveBooking() {
         try {
-            File file = new File("booking.txt");
-            if (!file.exists()) {
-                JOptionPane.showMessageDialog(this, "No bookings found.");
+            // Get values
+            String name = txtName.getText();
+            String email = txtEmail.getText();
+            String movie = (String) comboMovies.getSelectedItem();
+            int seat = (Integer) spinSeat.getValue();
+
+            // Validation
+            if (name.length() == 0) {
+                JOptionPane.showMessageDialog(this, "Please enter your name!");
                 return;
             }
 
-            StringBuilder content = new StringBuilder();
-            Scanner scanner = new Scanner(file);
-            while (scanner.hasNextLine()) {
-                content.append(scanner.nextLine()).append("\n");
+            // Create our Object (Inheritance)
+            MovieBooking myBooking = new MovieBooking(name, movie, seat, email);
+
+            // Write to file (Append mode is true)
+            FileWriter fw = new FileWriter("booking.txt", true);
+            PrintWriter pw = new PrintWriter(fw);
+
+            pw.println(myBooking.getDataForFile());
+
+            pw.close();
+            fw.close(); // Close file to save it
+
+            // Show success message dialog
+            JTextArea area = new JTextArea(myBooking.toString());
+            area.setEditable(false);
+            area.setBackground(new Color(230, 230, 230));
+
+            JOptionPane.showMessageDialog(this, area, "Success!", JOptionPane.INFORMATION_MESSAGE, iconSuccess);
+
+            // Clear fields
+            txtName.setText("");
+            txtEmail.setText("");
+
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error saving to file: " + e.getMessage());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Something went wrong: " + e.getMessage());
+        }
+    }
+
+    // Read and show booking history
+    private void showBookingHistory() {
+        try {
+            File f = new File("booking.txt");
+            if (!f.exists()) {
+                JOptionPane.showMessageDialog(this, "No bookings yet!");
+                return;
             }
-            scanner.close();
 
-            JTextArea textArea = new JTextArea(content.toString());
-            JScrollPane scrollPane = new JScrollPane(textArea);
-            textArea.setLineWrap(true);
-            textArea.setWrapStyleWord(true);
-            scrollPane.setPreferredSize(new Dimension(400, 300));
+            String allText = "";
+            Scanner sc = new Scanner(f);
+            while (sc.hasNextLine()) {
+                allText += sc.nextLine() + "\n"; // Simple string concatenation
+            }
+            sc.close();
 
-            JOptionPane.showMessageDialog(this, scrollPane, "All Bookings", JOptionPane.PLAIN_MESSAGE);
+            JTextArea historyArea = new JTextArea(allText);
+            JScrollPane scroll = new JScrollPane(historyArea);
+            scroll.setPreferredSize(new Dimension(400, 300));
+
+            JOptionPane.showMessageDialog(this, scroll, "Booking History", JOptionPane.PLAIN_MESSAGE);
 
         } catch (FileNotFoundException e) {
-            JOptionPane.showMessageDialog(this, "Error reading booking file.");
+            JOptionPane.showMessageDialog(this, "Error reading history.");
         }
     }
 
-    // Helper method to load ImageIcon with fallback
-    private ImageIcon loadIcon(String fileName) {
+    // Helper to load image safely
+    private ImageIcon loadImage(String path) {
         try {
-            return new ImageIcon(fileName); // Exception Handling #1 (General Exception)
+            return new ImageIcon(path);
         } catch (Exception e) {
-            System.out.println("Warning: Could not load icon " + fileName);
+            System.out.println("Image not found: " + path);
             return null;
         }
     }
 
-    // Event handler for ComboBox
-    private void updatePrice() {
-        String selectedMovie = (String) movieCombo.getSelectedItem();
-        // Simple feedback logic
-    }
-
     public static void main(String[] args) {
-        // Ensure GUI is created on Event Dispatch Thread
-        SwingUtilities.invokeLater(() -> new MainFrame());
+        new MainFrame();
     }
 }
