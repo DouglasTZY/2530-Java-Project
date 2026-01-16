@@ -1,3 +1,8 @@
+// Douglas Tan Tze Yu 1221206532 
+// Joel Nithyananthan Paramananthan 1211205630
+// RS4 
+// Java Project - Movie Booking System 
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
