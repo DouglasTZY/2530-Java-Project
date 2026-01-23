@@ -269,3 +269,26 @@ public class MainFrame extends JFrame {
         new MainFrame();
     }
 }
+
+// Create Top Header Panel
+    JPanel topPanel = new JPanel();
+    topPanel.setBackground(UIHelper.COLOR_PRIMARY); // <--- CHANGE THIS
+    JLabel lblHeader = new JLabel("Movie Booking System", iconPoster, JLabel.CENTER);
+    UIHelper.styleHeader(lblHeader); // <--- CHANGE THIS
+    topPanel.add(lblHeader);
+
+    // Create Center Panel
+    JPanel formPanel = new JPanel(new GridLayout(5, 2, 10, 10));
+    formPanel.setBackground(UIHelper.COLOR_BG); // <--- CHANGE THIS
+    formPanel.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40)); // <--- INCREASE PADDING
+
+ txtName = new JTextField();
+    UIHelper.styleTextField(txtName); // <--- ADD THIS
+
+    txtEmail = new JTextField();
+    UIHelper.styleTextField(txtEmail); // <--- ADD THIS
+    
+    comboMovies = new JComboBox<>();
+    UIHelper.styleComboBox(comboMovies); // <--- ADD THIS
+
+
