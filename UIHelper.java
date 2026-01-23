@@ -1,32 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-
-// Helper class to make our UI look consistent
-public class UIHelper {
-
-    // Make the label look like a title (Blue and Bold)
-    public static void makeTitle(JLabel label) {
-        label.setFont(new Font("Arial", Font.BOLD, 20));
-        label.setForeground(Color.BLUE);
-    }
-
-    // Make buttons look standard
-    public static void styleButton(JButton btn) {
-        btn.setFont(new Font("Arial", Font.PLAIN, 14));
-        btn.setBackground(Color.LIGHT_GRAY);
-        btn.setForeground(Color.BLACK);
-    }
-
-    // Style text fields
-    public static void styleTextField(JTextField tf) {
-        tf.setFont(new Font("Arial", Font.PLAIN, 12));
-        tf.setBackground(Color.WHITE);
-        tf.setForeground(Color.BLACK);
-    }
-}
-
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -34,10 +7,10 @@ import java.awt.event.MouseEvent;
 public class UIHelper {
 
     // Modern Color Palette
-    public static final Color COLOR_PRIMARY = new Color(41, 128, 185);    // Nice Blue
-    public static final Color COLOR_SECONDARY = new Color(52, 152, 219);  // Lighter Blue
-    public static final Color COLOR_BG = new Color(236, 240, 241);        // Soft Grey
-    public static final Color COLOR_TEXT = new Color(44, 62, 80);         // Dark Grey
+    public static final Color COLOR_PRIMARY = new Color(41, 128, 185); // Nice Blue
+    public static final Color COLOR_SECONDARY = new Color(52, 152, 219); // Lighter Blue
+    public static final Color COLOR_BG = new Color(236, 240, 241); // Soft Grey
+    public static final Color COLOR_TEXT = new Color(44, 62, 80); // Dark Grey
     public static final Color COLOR_WHITE = Color.WHITE;
 
     // Fonts
@@ -87,11 +60,10 @@ public class UIHelper {
         tf.setBackground(COLOR_WHITE);
         tf.setForeground(COLOR_TEXT);
         tf.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(189, 195, 199)),
-            BorderFactory.createEmptyBorder(5, 5, 5, 5)
-        ));
+                BorderFactory.createLineBorder(new Color(189, 195, 199)),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
     }
-    
+
     // Style ComboBox
     public static void styleComboBox(JComboBox<String> box) {
         box.setFont(FONT_INPUT);
@@ -99,10 +71,3 @@ public class UIHelper {
         box.setForeground(COLOR_TEXT);
     }
 }
-
-
-
-
-
-
-
