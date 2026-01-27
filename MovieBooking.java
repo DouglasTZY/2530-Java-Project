@@ -1,5 +1,6 @@
 // Child class that extends Booking
 // This handles the specific details for a movie ticket
+
 public class MovieBooking extends Booking {
 
     // Extra variables for movie details
