@@ -1,4 +1,3 @@
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -8,111 +7,138 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.PrintWriter;
 import java.util.Scanner;
 import java.util.ArrayList;
 
 public class BookingHistoryFrame extends JFrame {
 
-    private User currentUser;
-    private JTable table;
-    private DefaultTableModel model;
-    private JButton btnClose;
+    private User activeUser;
+    private JTable bookingTable;
+    private DefaultTableModel tableModel;
+    private JButton btnExit, btnDelete;
 
-    public BookingHistoryFrame(User user) {
-        this.currentUser = user;
+    public BookingHistoryFrame(User u) {
+        this.activeUser = u;
 
-        setTitle("My Booking History - " + user.getUsername());
-        setSize(600, 400);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Close this, not app
+        setTitle("Purchase Records - " + u.getUsername());
+        setSize(700, 450);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
         setLocationRelativeTo(null);
 
-        // Header
-        JPanel topPanel = new JPanel();
-        topPanel.setBackground(UIHelper.COLOR_PRIMARY);
-        JLabel lblHeader = new JLabel("Your Bookings");
-        UIHelper.styleHeader(lblHeader);
-        topPanel.add(lblHeader);
-        add(topPanel, BorderLayout.NORTH);
+        JPanel topPnl = new JPanel();
+        topPnl.setBackground(AppStyle.MAIN_COLOR);
+        JLabel titleLbl = new JLabel("Your Booking History");
+        AppStyle.styleHeader(titleLbl);
+        topPnl.add(titleLbl);
+        add(topPnl, BorderLayout.NORTH);
 
-        // Table
-        String[] columns = { "Date", "Movie", "Seat", "Passenger" };
-        model = new DefaultTableModel(columns, 0);
-        table = new JTable(model);
-        table.setFillsViewportHeight(true);
-        JScrollPane scrollPane = new JScrollPane(table);
-        add(scrollPane, BorderLayout.CENTER);
+        String[] headers = { "Selected Date", "Movie Title", "Seat No", "Customer Name" };
+        tableModel = new DefaultTableModel(headers, 0);
+        bookingTable = new JTable(tableModel);
+        bookingTable.setRowHeight(25);
+        JScrollPane scroll = new JScrollPane(bookingTable);
+        add(scroll, BorderLayout.CENTER);
 
-        // Bottom
-        JPanel botPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        btnClose = new JButton("Close");
-        UIHelper.styleButton(btnClose);
+        JPanel botPnl = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-        btnClose.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
+        btnDelete = new JButton("Delete Record");
+        AppStyle.styleButton(btnDelete);
+        btnDelete.setBackground(new java.awt.Color(231, 76, 60));
 
-        botPanel.add(btnClose);
-        add(botPanel, BorderLayout.SOUTH);
+        btnExit = new JButton("Go Back");
+        AppStyle.styleButton(btnExit);
 
-        // Load Data
-        loadBookings();
+        btnDelete.addActionListener(e -> removeSelectedRecord());
+        btnExit.addActionListener(e -> dispose());
+
+        botPnl.add(btnDelete);
+        botPnl.add(btnExit);
+        add(botPnl, BorderLayout.SOUTH);
+
+        loadUserBookings();
 
         setVisible(true);
     }
 
-    private void loadBookings() {
+    private void loadUserBookings() {
         try {
             File f = new File("booking.txt");
             if (!f.exists())
                 return;
 
-            Scanner sc = new Scanner(f);
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                // Format: [2025-01-27 22:56] Douglas | Avengers | Seat: 5 | douglas@mail.com
-                // We need to parse this messy string or just check if it contains the email
+            Scanner s = new Scanner(f);
+            while (s.hasNextLine()) {
+                String rowText = s.nextLine();
 
-                // Simple Check: Does the line contain the user's email?
-                if (line.contains(currentUser.getEmail())) {
-                    // Try to make it look nice in table
-                    // Split by "|"
-                    String[] parts = line.split("\\|");
-                    if (parts.length >= 4) {
-                        // Part 0: [Date] Name
-                        // Part 1: Movie
-                        // Part 2: Seat: X
-                        // Part 3: Email
+                if (rowText.contains(activeUser.getEmail())) {
+                    String[] rowData = rowText.split("\\|");
+                    if (rowData.length >= 4) {
+                        String dateStr = rowData[0].trim();
+                        String titleStr = rowData[1].trim();
+                        String seatStr = rowData[2].trim();
 
-                        String p0 = parts[0].trim();
-                        String date = p0;
-                        String passenger = "";
-
-                        // Extract date vs name from "[Date] Name"
-                        int closeBracket = p0.indexOf("]");
-                        if (closeBracket != -1) {
-                            date = p0.substring(0, closeBracket + 1);
-                            passenger = p0.substring(closeBracket + 1).trim();
+                        int bracket = dateStr.indexOf("]");
+                        if (bracket != -1) {
+                            String d = dateStr.substring(0, bracket + 1);
+                            String n = dateStr.substring(bracket + 1).trim();
+                            tableModel.addRow(new Object[] { d, titleStr, seatStr, n });
                         }
-
-                        String movie = parts[1].trim();
-                        String seat = parts[2].trim();
-
-                        model.addRow(new Object[] { date, movie, seat, passenger });
                     }
                 }
             }
-            sc.close();
+            s.close();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error loading history.");
+            JOptionPane.showMessageDialog(this, "Failed to load database records!");
+        }
+    }
+
+    private void removeSelectedRecord() {
+        int selectedRow = bookingTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a booking from the table first!");
+            return;
+        }
+
+        int choice = JOptionPane.showConfirmDialog(this, "Do you really want to delete this record?",
+                "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+        if (choice != JOptionPane.YES_OPTION)
+            return;
+
+        try {
+            ArrayList<String> fileLines = new ArrayList<>();
+            File bookingFile = new File("booking.txt");
+            Scanner s = new Scanner(bookingFile);
+
+            String d = (String) tableModel.getValueAt(selectedRow, 0);
+            String t = (String) tableModel.getValueAt(selectedRow, 1);
+            String sNo = (String) tableModel.getValueAt(selectedRow, 2);
+            String uName = (String) tableModel.getValueAt(selectedRow, 3);
+
+            String targetRow = d + " " + uName + " | " + t + " | " + sNo + " | " + activeUser.getEmail();
+
+            while (s.hasNextLine()) {
+                String currentLine = s.nextLine();
+                if (!currentLine.trim().equals(targetRow.trim())) {
+                    fileLines.add(currentLine);
+                }
+            }
+            s.close();
+
+            PrintWriter pw = new PrintWriter(bookingFile);
+            for (String line : fileLines) {
+                pw.println(line);
+            }
+            pw.close();
+
+            tableModel.removeRow(selectedRow);
+            JOptionPane.showMessageDialog(this, "Booking record removed successfully.");
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error during deletion: " + ex.getMessage());
         }
     }
 }

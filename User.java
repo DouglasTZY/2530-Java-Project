@@ -1,13 +1,12 @@
-// Basic User Model to hold session info
 public class User {
     private String username;
     private String password;
     private String email;
 
-    public User(String username, String password, String email) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
+    public User(String u, String p, String e) {
+        this.username = u;
+        this.password = p;
+        this.email = e;
     }
 
     public String getUsername() {

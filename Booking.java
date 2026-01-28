@@ -1,29 +1,18 @@
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
-// Parent class to store basic booking info
 public class Booking {
-    // Protected variables so subclasses can access them
-    protected String name;
-    protected String date;
+    protected String customerName;
+    protected String chosenDate;
 
-    // Constructor
-    public Booking(String name) {
-        this.name = name;
-
-        // Go get the current time
-        LocalDateTime now = LocalDateTime.now();
-        // Simple format: Year-Month-Day Hour:Minute
-        DateTimeFormatter myFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        this.date = now.format(myFormat);
+    public Booking(String n, String d) {
+        this.customerName = n;
+        this.chosenDate = d;
     }
 
-    public String getName() {
-        return name;
+    public String getCustomerName() {
+        return customerName;
     }
 
-    // Display booking info
     public String toString() {
-        return "Date: " + date + "\nName: " + name;
+        return "Date: " + chosenDate + "\nName: " + customerName;
     }
 }

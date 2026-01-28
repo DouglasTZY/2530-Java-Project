@@ -1,5 +1,4 @@
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -9,110 +8,92 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.BufferedWriter;
 import java.util.Scanner;
 
 public class RegisterFrame extends JFrame {
 
-    private JTextField txtUser, txtEmail;
-    private JPasswordField txtPass, txtConfirm;
-    private JButton btnRegister, btnBack;
+    private JTextField boxUser, boxEmail;
+    private JPasswordField boxPass, boxConfirm;
+    private JButton btnSignUp, btnBack;
 
     public RegisterFrame() {
-        setTitle("Create Account");
+        setTitle("Join Movie System - Sign Up");
         setSize(400, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        setLocationRelativeTo(null); // Center window
+        setLocationRelativeTo(null);
 
-        // Title Panel
-        JPanel topPanel = new JPanel();
-        topPanel.setBackground(UIHelper.COLOR_PRIMARY);
-        JLabel lblTitle = new JLabel("Register New User");
-        UIHelper.styleHeader(lblTitle);
-        topPanel.add(lblTitle);
-        add(topPanel, BorderLayout.NORTH);
+        JPanel topPnl = new JPanel();
+        topPnl.setBackground(AppStyle.MAIN_COLOR);
+        JLabel titleLabel = new JLabel("Create New Account");
+        AppStyle.styleHeader(titleLabel);
+        topPnl.add(titleLabel);
+        add(topPnl, BorderLayout.NORTH);
 
-        // Form Panel
-        JPanel formPanel = new JPanel(new GridLayout(5, 2, 10, 10));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        formPanel.setBackground(UIHelper.COLOR_BG);
+        JPanel formPnl = new JPanel(new GridLayout(5, 2, 10, 10));
+        formPnl.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        formPnl.setBackground(AppStyle.BG_COLOR);
 
-        // Components
         JLabel l1 = new JLabel("Username:");
-        JLabel l2 = new JLabel("Email:");
+        JLabel l2 = new JLabel("Email ID:");
         JLabel l3 = new JLabel("Password:");
-        JLabel l4 = new JLabel("Confirm Password:");
+        JLabel l4 = new JLabel("Confirm Pass:");
 
-        UIHelper.makeTitle(l1);
-        UIHelper.makeTitle(l2);
-        UIHelper.makeTitle(l3);
-        UIHelper.makeTitle(l4);
+        AppStyle.applyLabelStyle(l1);
+        AppStyle.applyLabelStyle(l2);
+        AppStyle.applyLabelStyle(l3);
+        AppStyle.applyLabelStyle(l4);
 
-        txtUser = new JTextField();
-        txtEmail = new JTextField();
-        txtPass = new JPasswordField();
-        txtConfirm = new JPasswordField();
+        boxUser = new JTextField();
+        boxEmail = new JTextField();
+        boxPass = new JPasswordField();
+        boxConfirm = new JPasswordField();
 
-        UIHelper.styleTextField(txtUser);
-        UIHelper.styleTextField(txtEmail);
-        UIHelper.styleTextField(txtPass);
-        UIHelper.styleTextField(txtConfirm);
+        AppStyle.styleTextField(boxUser);
+        AppStyle.styleTextField(boxEmail);
+        AppStyle.styleTextField(boxPass);
+        AppStyle.styleTextField(boxConfirm);
 
-        btnRegister = new JButton("Sign Up");
-        UIHelper.styleButton(btnRegister);
+        btnBack = new JButton("Cancel");
+        AppStyle.styleButton(btnBack);
 
-        btnBack = new JButton("Back to Login");
-        UIHelper.styleButton(btnBack);
+        btnSignUp = new JButton("Register Now");
+        AppStyle.styleButton(btnSignUp);
 
-        // Add to panel
-        formPanel.add(l1);
-        formPanel.add(txtUser);
-        formPanel.add(l2);
-        formPanel.add(txtEmail);
-        formPanel.add(l3);
-        formPanel.add(txtPass);
-        formPanel.add(l4);
-        formPanel.add(txtConfirm);
-        formPanel.add(btnBack);
-        formPanel.add(btnRegister);
+        formPnl.add(l1);
+        formPnl.add(boxUser);
+        formPnl.add(l2);
+        formPnl.add(boxEmail);
+        formPnl.add(l3);
+        formPnl.add(boxPass);
+        formPnl.add(l4);
+        formPnl.add(boxConfirm);
+        formPnl.add(btnBack);
+        formPnl.add(btnSignUp);
 
-        add(formPanel, BorderLayout.CENTER);
+        add(formPnl, BorderLayout.CENTER);
 
-        // Events
-        btnRegister.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                doRegister();
-            }
-        });
+        btnSignUp.addActionListener(e -> saveNewUser());
 
-        btnBack.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new LoginFrame(); // Go back
-                dispose();
-            }
+        btnBack.addActionListener(e -> {
+            new LoginFrame();
+            dispose();
         });
 
         setVisible(true);
     }
 
-    private void doRegister() {
-        String user = txtUser.getText().trim();
-        String mail = txtEmail.getText().trim();
-        String p1 = new String(txtPass.getPassword());
-        String p2 = new String(txtConfirm.getPassword());
+    private void saveNewUser() {
+        String u = boxUser.getText().trim();
+        String e = boxEmail.getText().trim();
+        String p1 = new String(boxPass.getPassword());
+        String p2 = new String(boxConfirm.getPassword());
 
-        // Basic Validation
-        if (user.isEmpty() || mail.isEmpty() || p1.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "All fields are required!");
+        if (u.isEmpty() || e.isEmpty() || p1.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all blanks!");
             return;
         }
 
@@ -121,55 +102,41 @@ public class RegisterFrame extends JFrame {
             return;
         }
 
-        // Check availability
-        if (checkUserExists(user)) {
-            JOptionPane.showMessageDialog(this, "Username already taken!");
+        if (checkExistingUser(u)) {
+            JOptionPane.showMessageDialog(this, "This username is already taken!");
             return;
         }
 
-        // Save
         try {
-            // Append to file
-            FileWriter fw = new FileWriter("users.txt", true);
-            BufferedWriter bw = new BufferedWriter(fw);
-            PrintWriter pw = new PrintWriter(bw);
+            FileWriter fileWriter = new FileWriter("users.txt", true);
+            PrintWriter printWriter = new PrintWriter(fileWriter);
+            printWriter.println(u + "|" + p1 + "|" + e);
+            printWriter.close();
+            fileWriter.close();
 
-            // Format: user|pass|email
-            pw.println(user + "|" + p1 + "|" + mail);
-
-            pw.close();
-            bw.close();
-            fw.close();
-
-            JOptionPane.showMessageDialog(this, "Account Created! Please Login.");
+            JOptionPane.showMessageDialog(this, "Registration successful! Please login.");
             new LoginFrame();
             dispose();
-
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Error saving user: " + e.getMessage());
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Database write error: " + ex.getMessage());
         }
     }
 
-    private boolean checkUserExists(String username) {
+    private boolean checkExistingUser(String name) {
         try {
             File f = new File("users.txt");
             if (!f.exists())
                 return false;
-
-            Scanner sc = new Scanner(f);
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                String[] parts = line.split("\\|");
-                if (parts.length >= 1) {
-                    if (parts[0].equalsIgnoreCase(username)) {
-                        sc.close();
-                        return true;
-                    }
+            Scanner s = new Scanner(f);
+            while (s.hasNextLine()) {
+                String row = s.nextLine();
+                if (row.startsWith(name + "|")) {
+                    s.close();
+                    return true;
                 }
             }
-            sc.close();
-        } catch (Exception e) {
-            // ignore
+            s.close();
+        } catch (Exception ex) {
         }
         return false;
     }

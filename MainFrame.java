@@ -5,7 +5,6 @@
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -13,9 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 import javax.swing.BorderFactory;
@@ -29,269 +26,225 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-// Main window for our booking application
 public class MainFrame extends JFrame {
 
-    private User currentUser; // The user logged in
+    private User loggedInUser;
 
-    // Components
-    private JLabel lblSeat, lblName, lblMovie, lblEmail;
-    private JTextField txtName, txtEmail;
-    private JSpinner spinSeat; // For selecting seat number (1-100)
-    private JComboBox<String> comboMovies;
-    private JButton btnBook;
+    private JLabel lblSeat, lblName, lblMovie, lblEmail, lblDate;
+    private JTextField txtNameField, txtEmailField;
+    private JSpinner spinSeatField;
+    private JComboBox<String> comboMovieField, comboDateField;
+    private JButton btnConfirmBooking, btnViewHistory;
 
-    // Menu components
-    private JMenuBar menuBar;
-    private JMenu menuFile, menuAccount;
-    private JMenuItem itemBookings, itemExit, itemLogout;
+    private JMenuBar mainMenuBar;
+    private JMenu optionMenu, accountMenu;
+    private JMenuItem itemHistory, itemExit, itemLogOut;
 
-    // Images
-    private ImageIcon iconPoster, iconTicket, iconSuccess;
+    private ImageIcon posterIcon, ticketIcon, successIcon;
 
-    // Modified Constructor to accept User
-    public MainFrame(User user) {
-        this.currentUser = user;
+    public MainFrame(User u) {
+        this.loggedInUser = u;
 
-        // Basic Frame settings
-        setTitle("Movie Booking System - " + user.getUsername());
-        setSize(600, 550);
+        setTitle("Movie Booking App - " + u.getUsername());
+        setSize(650, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        setLocationRelativeTo(null); // Center it
+        setLocationRelativeTo(null);
 
-        // 1. Setup the Menu Bar
-        setupMenu();
-        setJMenuBar(menuBar);
+        initializeMenu();
+        setJMenuBar(mainMenuBar);
 
-        // 2. Load Images (Scaled)
-        iconPoster = loadImage("poster.png", 100, 150);
-        iconTicket = loadImage("ticket.png", 30, 30);
-        iconSuccess = loadImage("success.png", 40, 40);
+        posterIcon = getResizedImage("poster.png", 100, 150);
+        ticketIcon = getResizedImage("ticket.png", 30, 30);
+        successIcon = getResizedImage("success.png", 40, 40);
 
-        // 3. Create Top Header Panel
-        JPanel topPanel = new JPanel();
-        topPanel.setBackground(UIHelper.COLOR_PRIMARY); // Blue Background
-        JLabel lblHeader = new JLabel("Welcome, " + user.getUsername(), iconPoster, JLabel.CENTER);
-        UIHelper.styleHeader(lblHeader); // White text, big font
-        topPanel.add(lblHeader);
-        add(topPanel, BorderLayout.NORTH);
+        JPanel headerPanel = new JPanel();
+        headerPanel.setBackground(AppStyle.MAIN_COLOR);
+        JLabel headerLabel = new JLabel("Book Your Tickets", posterIcon, JLabel.CENTER);
+        AppStyle.styleHeader(headerLabel);
+        headerPanel.add(headerLabel);
+        add(headerPanel, BorderLayout.NORTH);
 
-        // 4. Create Center Panel for Form
-        // Grid layout with 5 rows, 2 columns, and gaps
-        JPanel formPanel = new JPanel(new GridLayout(5, 2, 10, 10));
-        formPanel.setBackground(UIHelper.COLOR_BG); // Soft Grey Background
-        formPanel.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40)); // More padding
+        JPanel centerPanel = new JPanel(new GridLayout(7, 2, 10, 15));
+        centerPanel.setBackground(AppStyle.BG_COLOR);
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
 
-        // initialize labels
-        lblSeat = new JLabel("Seat Number:");
-        lblName = new JLabel("Passenger Name:");
-        lblMovie = new JLabel("Select Movie:");
-        lblEmail = new JLabel("Email Address:");
+        lblName = new JLabel("Full Name:");
+        lblMovie = new JLabel("Movie:");
+        lblDate = new JLabel("Date:");
+        lblSeat = new JLabel("Seat:");
+        lblEmail = new JLabel("Email:");
 
-        // Style labels using our helper class
-        UIHelper.makeTitle(lblSeat);
-        UIHelper.makeTitle(lblName);
-        UIHelper.makeTitle(lblMovie);
-        UIHelper.makeTitle(lblEmail);
+        AppStyle.applyLabelStyle(lblName);
+        AppStyle.applyLabelStyle(lblMovie);
+        AppStyle.applyLabelStyle(lblDate);
+        AppStyle.applyLabelStyle(lblSeat);
+        AppStyle.applyLabelStyle(lblEmail);
 
-        // Initialize inputs
-        spinSeat = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1)); // min 1, max 100
+        txtNameField = new JTextField(u.getUsername());
+        AppStyle.styleTextField(txtNameField);
 
-        txtName = new JTextField();
-        UIHelper.styleTextField(txtName);
-        txtName.setText(user.getUsername()); // Pre-fill name
+        txtEmailField = new JTextField(u.getEmail());
+        AppStyle.styleTextField(txtEmailField);
+        txtEmailField.setEditable(false);
 
-        txtEmail = new JTextField();
-        UIHelper.styleTextField(txtEmail);
-        txtEmail.setText(user.getEmail()); // Pre-fill email
-        txtEmail.setEditable(false); // ID cannot be changed
+        spinSeatField = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
 
-        // Movie dropdown - load from file
-        comboMovies = new JComboBox<>();
-        UIHelper.styleComboBox(comboMovies);
-        readMovies();
+        comboMovieField = new JComboBox<>();
+        AppStyle.styleComboBox(comboMovieField);
+        loadMoviesList();
 
-        // Book Button
-        btnBook = new JButton("Book Ticket", iconTicket);
-        UIHelper.styleButton(btnBook);
+        String[] dateOptions = { "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02" };
+        comboDateField = new JComboBox<>(dateOptions);
+        AppStyle.styleComboBox(comboDateField);
 
-        // Add everything to the grid
-        formPanel.add(lblName);
-        formPanel.add(txtName);
+        btnConfirmBooking = new JButton("Book Seat Now", ticketIcon);
+        AppStyle.styleButton(btnConfirmBooking);
 
-        formPanel.add(lblMovie);
-        formPanel.add(comboMovies);
+        btnViewHistory = new JButton("View Previous Bookings");
+        AppStyle.styleButton(btnViewHistory);
+        btnViewHistory.setBackground(new Color(46, 204, 113));
 
-        formPanel.add(lblSeat);
-        formPanel.add(spinSeat);
+        centerPanel.add(lblName);
+        centerPanel.add(txtNameField);
+        centerPanel.add(lblMovie);
+        centerPanel.add(comboMovieField);
+        centerPanel.add(lblDate);
+        centerPanel.add(comboDateField);
+        centerPanel.add(lblSeat);
+        centerPanel.add(spinSeatField);
+        centerPanel.add(lblEmail);
+        centerPanel.add(txtEmailField);
+        centerPanel.add(btnViewHistory);
+        centerPanel.add(btnConfirmBooking);
 
-        formPanel.add(lblEmail);
-        formPanel.add(txtEmail);
+        add(centerPanel, BorderLayout.CENTER);
 
-        formPanel.add(btnBook);
-        formPanel.add(new JPanel()); // Empty spacer
-
-        add(formPanel, BorderLayout.CENTER);
-
-        // 5. Events / Actions
-
-        // Button Click Action
-        btnBook.addActionListener(new ActionListener() {
+        btnConfirmBooking.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                saveBooking();
+                processAndSaveBooking();
             }
         });
 
-        // Focus Listener for Name field (Auto-capitalize)
-        txtName.addFocusListener(new FocusListener() {
+        btnViewHistory.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new BookingHistoryFrame(loggedInUser);
+            }
+        });
+
+        txtNameField.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
-                // Do nothing
             }
 
             @Override
             public void focusLost(FocusEvent e) {
-                String text = txtName.getText();
-                if (text != null && text.length() > 0) {
-                    txtName.setText(text.toUpperCase());
+                String val = txtNameField.getText();
+                if (val != null && !val.isEmpty()) {
+                    txtNameField.setText(val.toUpperCase());
                 }
             }
         });
 
-        // Show window
         setVisible(true);
     }
 
-    // Initialize the menu bar
-    private void setupMenu() {
-        menuBar = new JMenuBar();
+    private void initializeMenu() {
+        mainMenuBar = new JMenuBar();
+        optionMenu = new JMenu("System Options");
+        accountMenu = new JMenu("User Account");
 
-        menuFile = new JMenu("File");
-        menuAccount = new JMenu("Account");
+        itemHistory = new JMenuItem("My Purchase History");
+        itemLogOut = new JMenuItem("Sign Out");
+        itemExit = new JMenuItem("Exit Application");
 
-        itemBookings = new JMenuItem("My Booking History");
-        itemLogout = new JMenuItem("Logout");
-        itemExit = new JMenuItem("Exit");
+        itemHistory.addActionListener(e -> new BookingHistoryFrame(loggedInUser));
 
-        // Action to view bookings (New Window)
-        itemBookings.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new BookingHistoryFrame(currentUser);
+        itemLogOut.addActionListener(e -> {
+            int reply = JOptionPane.showConfirmDialog(this, "Are you sure you want to sign out?", "Confirm Log Out",
+                    JOptionPane.YES_NO_OPTION);
+            if (reply == JOptionPane.YES_OPTION) {
+                new LoginFrame();
+                dispose();
             }
         });
 
-        // Action to logout
-        itemLogout.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int choice = JOptionPane.showConfirmDialog(MainFrame.this, "Are you sure you want to logout?", "Logout",
-                        JOptionPane.YES_NO_OPTION);
-                if (choice == JOptionPane.YES_OPTION) {
-                    new LoginFrame();
-                    dispose();
-                }
-            }
-        });
+        itemExit.addActionListener(e -> System.exit(0));
 
-        // Action to close app
-        itemExit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
+        optionMenu.add(itemHistory);
+        optionMenu.addSeparator();
+        optionMenu.add(itemExit);
+        accountMenu.add(itemLogOut);
 
-        menuFile.add(itemBookings);
-        menuFile.addSeparator(); // Line separator
-        menuFile.add(itemExit);
-
-        menuAccount.add(itemLogout);
-
-        menuBar.add(menuFile);
-        menuBar.add(menuAccount);
+        mainMenuBar.add(optionMenu);
+        mainMenuBar.add(accountMenu);
     }
 
-    // Read movies from text file
-    private void readMovies() {
+    private void loadMoviesList() {
         try {
-            File f = new File("movies.txt");
-            if (f.exists()) {
-                Scanner sc = new Scanner(f);
-                while (sc.hasNextLine()) {
-                    String line = sc.nextLine();
-                    if (line.length() > 0) {
-                        comboMovies.addItem(line);
-                    }
+            File movieFile = new File("movies.txt");
+            if (movieFile.exists()) {
+                Scanner s = new Scanner(movieFile);
+                while (s.hasNextLine()) {
+                    String row = s.nextLine().trim();
+                    if (!row.isEmpty())
+                        comboMovieField.addItem(row);
                 }
-                sc.close();
+                s.close();
             } else {
-                comboMovies.addItem("Default Movie 1");
-                comboMovies.addItem("Default Movie 2");
+                comboMovieField.addItem("No Movies Found");
             }
-        } catch (FileNotFoundException e) {
-            JOptionPane.showMessageDialog(this, "Cannot find movies.txt!");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error reading movie source file.");
         }
     }
 
-    // Save booking to file
-    private void saveBooking() {
+    private void processAndSaveBooking() {
         try {
-            // Get values
-            String name = txtName.getText();
-            String email = txtEmail.getText();
-            String movie = (String) comboMovies.getSelectedItem();
-            int seat = (Integer) spinSeat.getValue();
+            String nameVal = txtNameField.getText().trim();
+            String movieVal = (String) comboMovieField.getSelectedItem();
+            String dateVal = (String) comboDateField.getSelectedItem();
+            int seatVal = (Integer) spinSeatField.getValue();
+            String emailVal = txtEmailField.getText();
 
-            // Validation
-            if (name.length() == 0) {
-                JOptionPane.showMessageDialog(this, "Please enter passenger name!");
+            if (nameVal.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter a passenger name first!");
                 return;
             }
 
-            // Create our Object (Inheritance)
-            MovieBooking myBooking = new MovieBooking(name, movie, seat, email);
+            MovieBooking myTicket = new MovieBooking(nameVal, movieVal, seatVal, emailVal, dateVal);
 
-            // Write to file (Append mode is true)
             FileWriter fw = new FileWriter("booking.txt", true);
             PrintWriter pw = new PrintWriter(fw);
-
-            pw.println(myBooking.getDataForFile());
-
+            pw.println(myTicket.getSaveLine());
             pw.close();
-            fw.close(); // Close file to save it
+            fw.close();
 
-            // Show success message dialog
-            JTextArea area = new JTextArea(myBooking.toString());
-            area.setEditable(false);
-            area.setBackground(new Color(230, 230, 230));
+            JTextArea summary = new JTextArea(myTicket.toString());
+            summary.setEditable(false);
+            summary.setBackground(new Color(240, 240, 240));
+            JOptionPane.showMessageDialog(this, summary, "Ticket Booked!", JOptionPane.INFORMATION_MESSAGE,
+                    successIcon);
 
-            JOptionPane.showMessageDialog(this, area, "Booking Success!", JOptionPane.INFORMATION_MESSAGE, iconSuccess);
-
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Error saving to file: " + e.getMessage());
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Something went wrong: " + e.getMessage());
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Save error: " + ex.getMessage());
         }
     }
 
-    // Helper to load image safely and scale it
-    private ImageIcon loadImage(String path, int width, int height) {
+    private ImageIcon getResizedImage(String file, int w, int h) {
         try {
-            ImageIcon originalIcon = new ImageIcon(path);
-            Image originalImage = originalIcon.getImage();
-            Image scaledImage = originalImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-            return new ImageIcon(scaledImage);
+            ImageIcon icon = new ImageIcon(file);
+            Image original = icon.getImage();
+            Image scaled = original.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+            return new ImageIcon(scaled);
         } catch (Exception e) {
-            System.out.println("Image not found: " + path);
             return null;
         }
     }

@@ -4,7 +4,6 @@
 // Java Project - Movie Booking System 
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -12,147 +11,112 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Scanner;
 
 public class LoginFrame extends JFrame {
 
-    private JTextField txtUser;
-    private JPasswordField txtPass;
-    private JButton btnLogin, btnRegister;
+    private JTextField inputUser;
+    private JPasswordField inputPass;
+    private JButton btnLogin, btnGoRegister;
 
     public LoginFrame() {
-        setTitle("Login - Movie Booking");
+        setTitle("Sign In - Movie Booking");
         setSize(400, 350);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        setLocationRelativeTo(null); // Center on screen
+        setLocationRelativeTo(null);
 
-        // Build UI
+        JPanel topPnl = new JPanel();
+        topPnl.setBackground(AppStyle.MAIN_COLOR);
+        JLabel headLbl = new JLabel("Member Login");
+        AppStyle.styleHeader(headLbl);
+        topPnl.add(headLbl);
+        add(topPnl, BorderLayout.NORTH);
 
-        // 1. Header (Logo area)
-        JPanel topPanel = new JPanel();
-        topPanel.setBackground(UIHelper.COLOR_PRIMARY);
-        JLabel lblTitle = new JLabel("Member Login");
-        UIHelper.styleHeader(lblTitle);
-        topPanel.add(lblTitle);
-        add(topPanel, BorderLayout.NORTH);
-
-        // 2. Form
-        JPanel centerPanel = new JPanel(new GridLayout(3, 2, 10, 20));
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
-        centerPanel.setBackground(UIHelper.COLOR_BG);
+        JPanel midPnl = new JPanel(new GridLayout(3, 2, 10, 20));
+        midPnl.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
+        midPnl.setBackground(AppStyle.BG_COLOR);
 
         JLabel l1 = new JLabel("Username:");
         JLabel l2 = new JLabel("Password:");
-        UIHelper.makeTitle(l1);
-        UIHelper.makeTitle(l2);
+        AppStyle.applyLabelStyle(l1);
+        AppStyle.applyLabelStyle(l2);
 
-        txtUser = new JTextField();
-        UIHelper.styleTextField(txtUser);
-        txtPass = new JPasswordField();
-        UIHelper.styleTextField(txtPass);
+        inputUser = new JTextField();
+        AppStyle.styleTextField(inputUser);
+        inputPass = new JPasswordField();
+        AppStyle.styleTextField(inputPass);
 
-        centerPanel.add(l1);
-        centerPanel.add(txtUser);
-        centerPanel.add(l2);
-        centerPanel.add(txtPass);
+        midPnl.add(l1);
+        midPnl.add(inputUser);
+        midPnl.add(l2);
+        midPnl.add(inputPass);
 
-        // Buttons Panel (Nested for better layout)
-        JPanel btnPanel = new JPanel(new GridLayout(1, 2, 10, 0));
-        btnPanel.setBackground(UIHelper.COLOR_BG); // match parent
+        btnGoRegister = new JButton("Register");
+        AppStyle.styleButton(btnGoRegister);
+        btnGoRegister.setBackground(new Color(39, 174, 96));
 
         btnLogin = new JButton("Login");
-        UIHelper.styleButton(btnLogin);
+        AppStyle.styleButton(btnLogin);
 
-        btnRegister = new JButton("Register");
-        UIHelper.styleButton(btnRegister);
-        btnRegister.setBackground(new Color(39, 174, 96)); // Green for register
+        midPnl.add(btnGoRegister);
+        midPnl.add(btnLogin);
 
-        centerPanel.add(btnRegister);
-        centerPanel.add(btnLogin);
+        add(midPnl, BorderLayout.CENTER);
 
-        add(centerPanel, BorderLayout.CENTER);
+        btnLogin.addActionListener(e -> executeLogin());
 
-        // Events
-        btnLogin.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                doLogin();
-            }
-        });
-
-        btnRegister.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new RegisterFrame();
-                dispose(); // Close login window
-            }
+        btnGoRegister.addActionListener(e -> {
+            new RegisterFrame();
+            dispose();
         });
 
         setVisible(true);
     }
 
-    private void doLogin() {
-        String u = txtUser.getText().trim();
-        String p = new String(txtPass.getPassword());
+    private void executeLogin() {
+        String uText = inputUser.getText().trim();
+        String pText = new String(inputPass.getPassword());
 
-        User foundUser = authenticate(u, p);
-        if (foundUser != null) {
-            // Success!
-            JOptionPane.showMessageDialog(this, "Welcome back, " + foundUser.getUsername() + "!");
-            // Open Main App
-            new MainFrame(foundUser);
-            dispose();
-        } else {
-            JOptionPane.showMessageDialog(this, "Invalid Username or Password!");
+        try {
+            User validUser = verifyCredentials(uText, pText);
+            if (validUser != null) {
+                JOptionPane.showMessageDialog(this, "Success! Welcome back " + validUser.getUsername());
+                new MainFrame(validUser);
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid username or password!");
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "System error: " + ex.getMessage());
         }
     }
 
-    private User authenticate(String username, String password) {
-        try {
-            File f = new File("users.txt");
-            if (!f.exists())
-                return null;
+    private User verifyCredentials(String username, String password) throws Exception {
+        File userFile = new File("users.txt");
+        if (!userFile.exists())
+            return null;
 
-            Scanner sc = new Scanner(f);
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                // Format: user|pass|email
-                String[] parts = line.split("\\|");
-                if (parts.length >= 3) {
-                    String fileUser = parts[0];
-                    String filePass = parts[1];
-                    String fileEmail = parts[2];
-
-                    if (fileUser.equalsIgnoreCase(username) && filePass.equals(password)) {
-                        sc.close();
-                        return new User(fileUser, filePass, fileEmail);
-                    }
+        Scanner s = new Scanner(userFile);
+        while (s.hasNextLine()) {
+            String row = s.nextLine();
+            String[] data = row.split("\\|");
+            if (data.length >= 3) {
+                if (data[0].equalsIgnoreCase(username) && data[1].equals(password)) {
+                    s.close();
+                    return new User(data[0], data[1], data[2]);
                 }
             }
-            sc.close();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        s.close();
         return null;
     }
 
-    // Main method for starting the app (New Entry Point)
     public static void main(String[] args) {
-        // Optional: Set simple Look and Feel
-        try {
-            // javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-        }
-
         new LoginFrame();
     }
 }
