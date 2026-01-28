@@ -3,14 +3,42 @@
 // RS4 
 // Java Project - Movie Booking System 
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Scanner;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 
 // Main window for our booking application
 public class MainFrame extends JFrame {
+
+    private User currentUser; // The user logged in
 
     // Components
     private JLabel lblSeat, lblName, lblMovie, lblEmail;
@@ -21,18 +49,22 @@ public class MainFrame extends JFrame {
 
     // Menu components
     private JMenuBar menuBar;
-    private JMenu menuFile;
-    private JMenuItem itemBookings, itemExit;
+    private JMenu menuFile, menuAccount;
+    private JMenuItem itemBookings, itemExit, itemLogout;
 
     // Images
     private ImageIcon iconPoster, iconTicket, iconSuccess;
 
-    public MainFrame() {
+    // Modified Constructor to accept User
+    public MainFrame(User user) {
+        this.currentUser = user;
+
         // Basic Frame settings
-        setTitle("Movie Booking System");
+        setTitle("Movie Booking System - " + user.getUsername());
         setSize(600, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        setLocationRelativeTo(null); // Center it
 
         // 1. Setup the Menu Bar
         setupMenu();
@@ -46,7 +78,7 @@ public class MainFrame extends JFrame {
         // 3. Create Top Header Panel
         JPanel topPanel = new JPanel();
         topPanel.setBackground(UIHelper.COLOR_PRIMARY); // Blue Background
-        JLabel lblHeader = new JLabel("Movie Booking System", iconPoster, JLabel.CENTER);
+        JLabel lblHeader = new JLabel("Welcome, " + user.getUsername(), iconPoster, JLabel.CENTER);
         UIHelper.styleHeader(lblHeader); // White text, big font
         topPanel.add(lblHeader);
         add(topPanel, BorderLayout.NORTH);
@@ -71,10 +103,15 @@ public class MainFrame extends JFrame {
 
         // Initialize inputs
         spinSeat = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1)); // min 1, max 100
+
         txtName = new JTextField();
         UIHelper.styleTextField(txtName);
+        txtName.setText(user.getUsername()); // Pre-fill name
+
         txtEmail = new JTextField();
         UIHelper.styleTextField(txtEmail);
+        txtEmail.setText(user.getEmail()); // Pre-fill email
+        txtEmail.setEditable(false); // ID cannot be changed
 
         // Movie dropdown - load from file
         comboMovies = new JComboBox<>();
@@ -86,14 +123,14 @@ public class MainFrame extends JFrame {
         UIHelper.styleButton(btnBook);
 
         // Add everything to the grid
-        formPanel.add(lblSeat);
-        formPanel.add(spinSeat);
-
         formPanel.add(lblName);
         formPanel.add(txtName);
 
         formPanel.add(lblMovie);
         formPanel.add(comboMovies);
+
+        formPanel.add(lblSeat);
+        formPanel.add(spinSeat);
 
         formPanel.add(lblEmail);
         formPanel.add(txtEmail);
@@ -136,16 +173,32 @@ public class MainFrame extends JFrame {
     // Initialize the menu bar
     private void setupMenu() {
         menuBar = new JMenuBar();
-        menuFile = new JMenu("File");
 
-        itemBookings = new JMenuItem("View Bookings");
+        menuFile = new JMenu("File");
+        menuAccount = new JMenu("Account");
+
+        itemBookings = new JMenuItem("My Booking History");
+        itemLogout = new JMenuItem("Logout");
         itemExit = new JMenuItem("Exit");
 
-        // Action to view bookings
+        // Action to view bookings (New Window)
         itemBookings.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showBookingHistory();
+                new BookingHistoryFrame(currentUser);
+            }
+        });
+
+        // Action to logout
+        itemLogout.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int choice = JOptionPane.showConfirmDialog(MainFrame.this, "Are you sure you want to logout?", "Logout",
+                        JOptionPane.YES_NO_OPTION);
+                if (choice == JOptionPane.YES_OPTION) {
+                    new LoginFrame();
+                    dispose();
+                }
             }
         });
 
@@ -160,7 +213,11 @@ public class MainFrame extends JFrame {
         menuFile.add(itemBookings);
         menuFile.addSeparator(); // Line separator
         menuFile.add(itemExit);
+
+        menuAccount.add(itemLogout);
+
         menuBar.add(menuFile);
+        menuBar.add(menuAccount);
     }
 
     // Read movies from text file
@@ -196,7 +253,7 @@ public class MainFrame extends JFrame {
 
             // Validation
             if (name.length() == 0) {
-                JOptionPane.showMessageDialog(this, "Please enter your name!");
+                JOptionPane.showMessageDialog(this, "Please enter passenger name!");
                 return;
             }
 
@@ -217,43 +274,12 @@ public class MainFrame extends JFrame {
             area.setEditable(false);
             area.setBackground(new Color(230, 230, 230));
 
-            JOptionPane.showMessageDialog(this, area, "Success!", JOptionPane.INFORMATION_MESSAGE, iconSuccess);
-
-            // Clear fields
-            txtName.setText("");
-            txtEmail.setText("");
+            JOptionPane.showMessageDialog(this, area, "Booking Success!", JOptionPane.INFORMATION_MESSAGE, iconSuccess);
 
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error saving to file: " + e.getMessage());
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Something went wrong: " + e.getMessage());
-        }
-    }
-
-    // Read and show booking history
-    private void showBookingHistory() {
-        try {
-            File f = new File("booking.txt");
-            if (!f.exists()) {
-                JOptionPane.showMessageDialog(this, "No bookings yet!");
-                return;
-            }
-
-            String allText = "";
-            Scanner sc = new Scanner(f);
-            while (sc.hasNextLine()) {
-                allText += sc.nextLine() + "\n"; // Simple string concatenation
-            }
-            sc.close();
-
-            JTextArea historyArea = new JTextArea(allText);
-            JScrollPane scroll = new JScrollPane(historyArea);
-            scroll.setPreferredSize(new Dimension(400, 300));
-
-            JOptionPane.showMessageDialog(this, scroll, "Booking History", JOptionPane.PLAIN_MESSAGE);
-
-        } catch (FileNotFoundException e) {
-            JOptionPane.showMessageDialog(this, "Error reading history.");
         }
     }
 
@@ -268,9 +294,5 @@ public class MainFrame extends JFrame {
             System.out.println("Image not found: " + path);
             return null;
         }
-    }
-
-    public static void main(String[] args) {
-        new MainFrame();
     }
 }
