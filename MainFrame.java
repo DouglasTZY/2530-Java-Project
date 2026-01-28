@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.Scanner;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -99,9 +101,9 @@ public class MainFrame extends JFrame {
         AppStyle.styleComboBox(comboMovieField);
         loadMoviesList();
 
-        String[] dateOptions = { "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02" };
-        comboDateField = new JComboBox<>(dateOptions);
+        comboDateField = new JComboBox<>();
         AppStyle.styleComboBox(comboDateField);
+        setupDateOptions();
 
         btnConfirmBooking = new JButton("Book Seat Now", ticketIcon);
         AppStyle.styleButton(btnConfirmBooking);
@@ -185,6 +187,15 @@ public class MainFrame extends JFrame {
 
         mainMenuBar.add(optionMenu);
         mainMenuBar.add(accountMenu);
+    }
+
+    private void setupDateOptions() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd (EEEE)");
+        Calendar cal = Calendar.getInstance();
+        for (int i = 0; i < 7; i++) {
+            comboDateField.addItem(sdf.format(cal.getTime()));
+            cal.add(Calendar.DAY_OF_YEAR, 1);
+        }
     }
 
     private void loadMoviesList() {

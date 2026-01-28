@@ -40,7 +40,7 @@ public class RegisterFrame extends JFrame {
         JLabel l1 = new JLabel("Username:");
         JLabel l2 = new JLabel("Email ID:");
         JLabel l3 = new JLabel("Password:");
-        JLabel l4 = new JLabel("Confirm Pass:");
+        JLabel l4 = new JLabel("Confirm Password:");
 
         AppStyle.applyLabelStyle(l1);
         AppStyle.applyLabelStyle(l2);
