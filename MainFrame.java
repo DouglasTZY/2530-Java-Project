@@ -1,7 +1,7 @@
+// Group 1 
+// Movie Booking System 
 // Douglas Tan Tze Yu 1221206532 
 // Joel Nithyananthan Paramananthan 1211205630
-// RS4 
-// Java Project - Movie Booking System 
 
 import java.awt.BorderLayout;
 import java.awt.Color;

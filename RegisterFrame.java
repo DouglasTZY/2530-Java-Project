@@ -1,3 +1,8 @@
+// Group 1 
+// Movie Booking System 
+// Douglas Tan Tze Yu 1221206532 
+// Joel Nithyananthan Paramananthan 1211205630
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
