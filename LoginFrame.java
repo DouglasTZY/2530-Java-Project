@@ -30,6 +30,7 @@ public class LoginFrame extends JFrame {
         setLayout(new BorderLayout());
         setLocationRelativeTo(null);
 
+        // Create the top panel for the title
         JPanel topPnl = new JPanel();
         topPnl.setBackground(AppStyle.MAIN_COLOR);
         JLabel headLbl = new JLabel("Member Login");
@@ -37,6 +38,7 @@ public class LoginFrame extends JFrame {
         topPnl.add(headLbl);
         add(topPnl, BorderLayout.NORTH);
 
+        // Center panel for input fields
         JPanel midPnl = new JPanel(new GridLayout(3, 2, 10, 20));
         midPnl.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
         midPnl.setBackground(AppStyle.BG_COLOR);
@@ -68,6 +70,7 @@ public class LoginFrame extends JFrame {
 
         add(midPnl, BorderLayout.CENTER);
 
+        // Add action listeners to buttons
         btnLogin.addActionListener(e -> executeLogin());
 
         btnGoRegister.addActionListener(e -> {
@@ -79,6 +82,7 @@ public class LoginFrame extends JFrame {
     }
 
     private void executeLogin() {
+        // Get text from fields
         String uText = inputUser.getText().trim();
         String pText = new String(inputPass.getPassword());
 
@@ -97,6 +101,7 @@ public class LoginFrame extends JFrame {
     }
 
     private User verifyCredentials(String username, String password) throws Exception {
+        // Read users.txt to find a match
         File userFile = new File("users.txt");
         if (!userFile.exists())
             return null;

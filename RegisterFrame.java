@@ -31,6 +31,7 @@ public class RegisterFrame extends JFrame {
         setLayout(new BorderLayout());
         setLocationRelativeTo(null);
 
+        // Top panel for title
         JPanel topPnl = new JPanel();
         topPnl.setBackground(AppStyle.MAIN_COLOR);
         JLabel titleLabel = new JLabel("Create New Account");
@@ -38,6 +39,7 @@ public class RegisterFrame extends JFrame {
         topPnl.add(titleLabel);
         add(topPnl, BorderLayout.NORTH);
 
+        // Form panel for user details
         JPanel formPnl = new JPanel(new GridLayout(5, 2, 10, 10));
         formPnl.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         formPnl.setBackground(AppStyle.BG_COLOR);
@@ -92,6 +94,7 @@ public class RegisterFrame extends JFrame {
     }
 
     private void saveNewUser() {
+        // Get input values
         String u = boxUser.getText().trim();
         String e = boxEmail.getText().trim();
         String p1 = new String(boxPass.getPassword());
@@ -113,6 +116,7 @@ public class RegisterFrame extends JFrame {
         }
 
         try {
+            // Write new user to file
             FileWriter fileWriter = new FileWriter("users.txt", true);
             PrintWriter printWriter = new PrintWriter(fileWriter);
             printWriter.println(u + "|" + p1 + "|" + e);

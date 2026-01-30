@@ -41,6 +41,7 @@ public class BookingHistoryFrame extends JFrame {
         topPnl.add(titleLbl);
         add(topPnl, BorderLayout.NORTH);
 
+        // Set up the table model and scroll pane
         String[] headers = { "Selected Date", "Movie Title", "Seat No", "Customer Name" };
         tableModel = new DefaultTableModel(headers, 0);
         bookingTable = new JTable(tableModel);
@@ -75,6 +76,7 @@ public class BookingHistoryFrame extends JFrame {
             if (!f.exists())
                 return;
 
+            // Scan file and filter by logged-in user email
             Scanner s = new Scanner(f);
             while (s.hasNextLine()) {
                 String rowText = s.nextLine();
@@ -125,6 +127,7 @@ public class BookingHistoryFrame extends JFrame {
 
             String targetRow = d + " " + uName + " | " + t + " | " + sNo + " | " + activeUser.getEmail();
 
+            // Read all lines except the one to be deleted
             while (s.hasNextLine()) {
                 String currentLine = s.nextLine();
                 if (!currentLine.trim().equals(targetRow.trim())) {

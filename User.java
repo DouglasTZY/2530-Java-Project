@@ -8,6 +8,7 @@ public class User {
     private String password;
     private String email;
 
+    // Constructor for user object
     public User(String u, String p, String e) {
         this.username = u;
         this.password = p;

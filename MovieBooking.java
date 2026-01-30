@@ -9,6 +9,7 @@ public class MovieBooking extends Booking {
     private int seatNumber;
     private String emailAddress;
 
+    // Constructor for movie ticket
     public MovieBooking(String name, String title, int seat, String mail, String date) {
         super(name, date);
         this.movieTitle = title;
@@ -24,6 +25,7 @@ public class MovieBooking extends Booking {
                 "\nEmail: " + emailAddress;
     }
 
+    // Format data for saving to text file
     public String getSaveLine() {
         return "[" + chosenDate + "] " + customerName + " | " + movieTitle + " | Seat: " + seatNumber + " | "
                 + emailAddress;

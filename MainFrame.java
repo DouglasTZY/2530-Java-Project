@@ -58,9 +58,11 @@ public class MainFrame extends JFrame {
         setLayout(new BorderLayout());
         setLocationRelativeTo(null);
 
+        // Initialize the top menu bar
         initializeMenu();
         setJMenuBar(mainMenuBar);
 
+        // Load images for UI
         posterIcon = getResizedImage("poster.png", 100, 150);
         ticketIcon = getResizedImage("ticket.png", 30, 30);
         successIcon = getResizedImage("success.png", 40, 40);
@@ -127,6 +129,7 @@ public class MainFrame extends JFrame {
 
         add(centerPanel, BorderLayout.CENTER);
 
+        // Button action to save the booking
         btnConfirmBooking.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -141,6 +144,7 @@ public class MainFrame extends JFrame {
             }
         });
 
+        // Auto-capitalize the name field when user leaves it
         txtNameField.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -190,6 +194,7 @@ public class MainFrame extends JFrame {
     }
 
     private void setupDateOptions() {
+        // Generate the next 7 days for the dropdown
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd (EEEE)");
         Calendar cal = Calendar.getInstance();
         for (int i = 0; i < 7; i++) {
@@ -200,6 +205,7 @@ public class MainFrame extends JFrame {
 
     private void loadMoviesList() {
         try {
+            // Read movie titles from file
             File movieFile = new File("movies.txt");
             if (movieFile.exists()) {
                 Scanner s = new Scanner(movieFile);
@@ -219,6 +225,7 @@ public class MainFrame extends JFrame {
 
     private void processAndSaveBooking() {
         try {
+            // Get all input values
             String nameVal = txtNameField.getText().trim();
             String movieVal = (String) comboMovieField.getSelectedItem();
             String dateVal = (String) comboDateField.getSelectedItem();
@@ -232,6 +239,7 @@ public class MainFrame extends JFrame {
 
             MovieBooking myTicket = new MovieBooking(nameVal, movieVal, seatVal, emailVal, dateVal);
 
+            // Write booking details to booking.txt
             FileWriter fw = new FileWriter("booking.txt", true);
             PrintWriter pw = new PrintWriter(fw);
             pw.println(myTicket.getSaveLine());

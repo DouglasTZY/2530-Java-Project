@@ -7,6 +7,7 @@ public class Booking {
     protected String customerName;
     protected String chosenDate;
 
+    // Constructor to set basic info
     public Booking(String n, String d) {
         this.customerName = n;
         this.chosenDate = d;
