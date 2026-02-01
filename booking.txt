@@ -1,7 +1,6 @@
 Time | Movie | Seat | Email
 [2026-02-04 (Wednesday)] ALEX | Avengers: Endgame | Seat: 3 | alex0987@gmail.com
 [2026-02-06 (Friday)] ALEX | The Dark Knight | Seat: 2 | alex0987@gmail.com
-[2026-02-05 (Thursday)] ROY | The Lion King | Seat: 1 | royus2345@gmail.com
 [2026-02-06 (Friday)] ROY | Avatar | Seat: 6 | royus2345@gmail.com
 [2026-02-03 (Tuesday)] ALI | The Matrix | Seat: 15 | ali4567@gmail.com
 [2026-02-07 (Saturday)] ALI | Inception | Seat: 11 | ali4567@gmail.com
@@ -9,3 +8,4 @@ Time | Movie | Seat | Email
 [2026-02-06 (Friday)] YUI | Spider-Man: No Way Home | Seat: 8 | yui4567@gmail.com
 [2026-02-03 (Tuesday)] EREN | Jurassic Park | Seat: 4 | eren8765@gmail.com
 [2026-02-05 (Thursday)] EREN | The Matrix | Seat: 7 | eren8765@gmail.com
+[2026-02-01 (Sunday)] ALEX | Avengers: Endgame | Seat: 7 | alex0987@gmail.com
