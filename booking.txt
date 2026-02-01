@@ -5,3 +5,4 @@ Time | Movie | Seat | Email
 [2026-01-23 17:37] QWEN | Interstellar | Seat: 13 | qwen8484@gmail.com
 [2026-01-28 12:11] OPUS | The Dark Knight | Seat: 11 | opus45637@gmail.com
 [2026-01-28 13:56] TYLER | Avengers: Endgame | Seat: 6 | tyler9087@gmail.com
+[2026-02-03 (Tuesday)] ALEX | Titanic | Seat: 15 | alex0987@gmail.com

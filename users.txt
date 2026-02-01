@@ -1,3 +1,4 @@
 admin|123456|admin@example.com
 tyler|34567|tyler9087@gmail.com
 qwer|1234|qwer2131@gmail.com
+Alex|12345|alex0987@gmail.com
