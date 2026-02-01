@@ -1,8 +1,11 @@
 Time | Movie | Seat | Email
-[2026-01-14 13:15] RUI | Inception | Seat: 1 | ruicg125689@gmail.com
-[2026-01-14 13:41] ROY | Avengers: Endgame | Seat: 4 | roy2354@gmail.com
-[2026-01-14 15:45] XENON | Spider-Man: No Way Home | Seat: 4 | xenon0978@gmail.com
-[2026-01-23 17:37] QWEN | Interstellar | Seat: 13 | qwen8484@gmail.com
-[2026-01-28 12:11] OPUS | The Dark Knight | Seat: 11 | opus45637@gmail.com
-[2026-01-28 13:56] TYLER | Avengers: Endgame | Seat: 6 | tyler9087@gmail.com
-[2026-02-03 (Tuesday)] ALEX | Titanic | Seat: 15 | alex0987@gmail.com
+[2026-02-04 (Wednesday)] ALEX | Avengers: Endgame | Seat: 3 | alex0987@gmail.com
+[2026-02-06 (Friday)] ALEX | The Dark Knight | Seat: 2 | alex0987@gmail.com
+[2026-02-05 (Thursday)] ROY | The Lion King | Seat: 1 | royus2345@gmail.com
+[2026-02-06 (Friday)] ROY | Avatar | Seat: 6 | royus2345@gmail.com
+[2026-02-03 (Tuesday)] ALI | The Matrix | Seat: 15 | ali4567@gmail.com
+[2026-02-07 (Saturday)] ALI | Inception | Seat: 11 | ali4567@gmail.com
+[2026-02-04 (Wednesday)] YUI | Interstellar | Seat: 4 | yui4567@gmail.com
+[2026-02-06 (Friday)] YUI | Spider-Man: No Way Home | Seat: 8 | yui4567@gmail.com
+[2026-02-03 (Tuesday)] EREN | Jurassic Park | Seat: 4 | eren8765@gmail.com
+[2026-02-05 (Thursday)] EREN | The Matrix | Seat: 7 | eren8765@gmail.com
